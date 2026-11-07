@@ -1,0 +1,127 @@
+
+.geofind-loader {
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px 20px;
+  text-align: center;
+  animation: geofind-fade-in 0.45s ease both;
+}
+
+.geofind-loader-glow {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  border: 1px solid rgba(255, 65, 77, 0.55);
+  border-radius: 50%;
+  background: linear-gradient(145deg, #45131c, #1a1015);
+  box-shadow:
+    0 0 18px rgba(255, 35, 55, 0.18),
+    inset 0 1px 1px rgba(255, 255, 255, 0.12);
+  animation: geofind-pulse 1.8s ease-in-out infinite;
+}
+
+.geofind-loader-icon {
+  color: #ff4655;
+  font-size: 44px;
+  line-height: 1;
+  text-shadow: 0 0 18px rgba(255, 55, 75, 0.8);
+  animation: geofind-icon-glow 2s ease-in-out infinite;
+}
+
+.geofind-loader-title {
+  margin: 8px 0 0;
+  color: #ff5865;
+  font-size: clamp(20px, 3vw, 26px);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  text-shadow: 0 0 18px rgba(255, 50, 70, 0.18);
+}
+
+.geofind-loader-subtitle {
+  margin: 0;
+  color: #a7a0a5;
+  font-size: 14px;
+}
+
+.geofind-loader-track {
+  width: min(200px, 70vw);
+  height: 4px;
+  overflow: hidden;
+  margin-top: 8px;
+  border-radius: 999px;
+  background: #32151c;
+}
+
+.geofind-loader-progress {
+  width: 42%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    #a90f2b,
+    #ff3047,
+    #ff9aa2,
+    #ff3047
+  );
+  box-shadow: 0 0 12px rgba(255, 48, 71, 0.8);
+  animation: geofind-progress 1.5s ease-in-out infinite;
+}
+
+.geofind-loader-label {
+  margin-top: 2px;
+  color: #e15b68;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+}
+
+@keyframes geofind-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes geofind-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 14px rgba(255, 35, 55, 0.15),
+      inset 0 1px 1px rgba(255, 255, 255, 0.12);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow:
+      0 0 30px rgba(255, 35, 55, 0.35),
+      inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    transform: scale(1.04);
+  }
+}
+
+@keyframes geofind-icon-glow {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+@keyframes geofind-progress {
+  0% { transform: translateX(-110%); }
+  100% { transform: translateX(340%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .geofind-loader,
+  .geofind-loader-glow,
+  .geofind-loader-icon,
+  .geofind-loader-progress {
+    animation: none;
+  }
+}

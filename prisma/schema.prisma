@@ -1,0 +1,129 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Category {
+  RESTAURANT
+  CAFE
+  HOSPITAL
+  GYM
+  ATM
+  PHARMACY
+  HOTEL
+  CONTRACTOR_HANDYMAN
+  PLUMBER
+  ELECTRICIAN
+  HVAC
+  APPLIANCE_REPAIR
+  ROOFING
+  LOCKSMITH
+  PAINTER
+  LANDSCAPING
+  NURSERY_GARDENING
+  FLORIST
+  TREE_SERVICE
+  HOME_CLEANING
+  FURNITURE_STORE
+  MOVER
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+
+  places      Place[]
+  reviews     Review[]
+  savedPlaces SavedPlace[]
+}
+
+model Place {
+  id            Int          @id @default(autoincrement())
+  name          String?
+  description   String
+  latitude      Float
+  longitude     Float
+  address       String
+  city          String
+  country       String
+  geohash       String?
+  category      Category
+  createdById   Int
+  createdBy     User         @relation(fields: [createdById], references: [id])
+  averageRating Float        @default(0)
+  reviewCount   Int @default(0)
+  reviews       Review[]
+  savedBy       SavedPlace[]
+  createdAt     DateTime     @default(now())
+
+  @@index([geohash])
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int
+  comment   String
+  userId    Int
+  placeId   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  // One review per user per place
+  @@unique([userId, placeId])
+
+  // Efficiently fetch reviews for a place
+  @@index([placeId, createdAt])
+}
+
+enum PlannedEventStatus {
+  PLANNED
+  COMPLETED
+  CANCELLED
+}
+
+model SavedPlace {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  placeId   Int
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  events PlannedEvent[]
+
+  @@unique([userId, placeId])
+  @@index([userId])
+}
+
+model PlannedEvent {
+  id                    Int                @id @default(autoincrement())
+  title                 String
+  notes                 String?
+  startsAt              DateTime
+  reminderMinutesBefore Int                @default(60)
+  status                PlannedEventStatus @default(PLANNED)
+  savedPlaceId          Int
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+
+  savedPlace SavedPlace @relation(fields: [savedPlaceId], references: [id], onDelete: Cascade)
+
+  @@index([savedPlaceId, startsAt])
+  @@index([status, startsAt])
+}

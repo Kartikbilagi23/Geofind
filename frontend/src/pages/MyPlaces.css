@@ -1,0 +1,256 @@
+
+.myplaces-page {
+  min-height: 100vh;
+  padding: 110px 7% 70px;
+  color: #fff;
+  background:
+    radial-gradient(ellipse at 10% 0%, rgba(180, 20, 40, 0.2), transparent 38%),
+    #100d10;
+}
+
+.myplaces-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  margin-bottom: 38px;
+}
+
+.myplaces-eyebrow {
+  color: #ff5268;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+}
+
+.myplaces-header h1 {
+  margin: 12px 0;
+  font-size: clamp(42px, 6vw, 68px);
+  letter-spacing: -3px;
+}
+
+.myplaces-header h1 span {
+  color: #ff435b;
+}
+
+.myplaces-subtitle {
+  color: #aaa1a6;
+  font-size: 15px;
+}
+
+.myplaces-explore {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 20px;
+  border: 1px solid rgba(255, 75, 100, 0.5);
+  border-radius: 12px;
+  color: white;
+  background: linear-gradient(135deg, #e92c49, #9d102a);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 8px 25px rgba(220, 25, 55, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.myplaces-explore:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(220, 25, 55, 0.35);
+}
+
+.myplaces-count {
+  margin-bottom: 20px;
+  color: #aaa1a6;
+  font-size: 14px;
+}
+
+.myplaces-count span {
+  color: #ff5268;
+  font-weight: 800;
+}
+
+.myplaces-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.myplace-card {
+  position: relative;
+  overflow: hidden;
+  padding: 23px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 19px;
+  background: linear-gradient(
+    145deg,
+    rgba(54, 27, 34, 0.8),
+    rgba(25, 19, 23, 0.95)
+  );
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+  transition: transform 0.25s, border-color 0.25s;
+}
+
+.myplace-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255, 65, 90, 0.45);
+}
+
+.myplace-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.myplace-category {
+  padding: 6px 10px;
+  border-radius: 20px;
+  color: #ff8191;
+  background: rgba(255, 55, 85, 0.12);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.myplace-remove {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255, 75, 100, 0.25);
+  border-radius: 50%;
+  color: #ff5268;
+  background: rgba(255, 50, 80, 0.1);
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+
+.myplace-remove:hover {
+  color: white;
+  background: #d92342;
+}
+
+.myplace-remove:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.myplace-card h2 {
+  margin: 22px 0 9px;
+  font-size: 22px;
+  letter-spacing: -0.5px;
+}
+
+.myplace-description {
+  min-height: 42px;
+  color: #aaa1a6;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.myplace-details {
+  display: grid;
+  gap: 10px;
+  margin-top: 22px;
+  padding: 17px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.myplace-details p {
+  margin: 0;
+  color: #c5b9be;
+  font-size: 12px;
+}
+
+.myplace-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 17px;
+  color: #82777d;
+  font-size: 11px;
+}
+
+.myplace-saved-label {
+  color: #ff6579;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.myplaces-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 75px 20px;
+  border: 1px dashed rgba(255, 80, 105, 0.3);
+  border-radius: 22px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.myplaces-empty-icon {
+  display: grid;
+  place-items: center;
+  width: 65px;
+  height: 65px;
+  margin-bottom: 20px;
+  border-radius: 20px;
+  color: #ff5268;
+  background: rgba(255, 55, 85, 0.12);
+  font-size: 30px;
+}
+
+.myplaces-empty h2 {
+  margin: 0 0 10px;
+  font-size: 25px;
+}
+
+.myplaces-empty p {
+  max-width: 420px;
+  margin: 0 0 24px;
+  color: #aaa1a6;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.myplaces-state {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 30px;
+  color: #fff;
+  background: #100d10;
+  text-align: center;
+}
+
+.myplaces-state p {
+  color: #aaa1a6;
+}
+
+.myplaces-state a {
+  color: #ff5268;
+}
+
+@media (max-width: 650px) {
+  .myplaces-page {
+    padding: 95px 5% 50px;
+  }
+
+  .myplaces-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .myplaces-header h1 {
+    letter-spacing: -2px;
+  }
+
+  .myplaces-grid {
+    grid-template-columns: 1fr;
+  }
+}

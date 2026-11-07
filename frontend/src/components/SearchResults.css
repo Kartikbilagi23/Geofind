@@ -1,0 +1,222 @@
+
+.search-results-page {
+  min-height: 70vh;
+  padding: 45px 6%;
+  background: #090909;
+  color: #f5f5f5;
+}
+
+.search-results-header {
+  max-width: 1400px;
+  margin: 0 auto 35px;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 32px;
+  color: #aaa;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.back-link:hover {
+  color: #ff3939;
+}
+
+.results-eyebrow {
+  color: #ff3939;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.search-results-header h1 {
+  margin: 10px 0;
+  font-size: clamp(28px, 4vw, 42px);
+}
+
+.results-subtitle {
+  color: #888;
+  font-size: 14px;
+}
+
+.results-count {
+  max-width: 1400px;
+  margin: 0 auto 20px;
+  display: flex;
+  justify-content: space-between;
+  color: #aaa;
+  font-size: 13px;
+}
+
+.places-grid {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.place-card {
+  min-width: 0;
+  padding: 22px;
+  background: #111;
+  border: 1px solid #292929;
+  border-radius: 14px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.place-card:hover {
+  border-color: #d52e2e;
+  transform: translateY(-4px);
+}
+
+.place-card-top,
+.place-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.place-category {
+  color: #ff5555;
+  background: #261010;
+  padding: 6px 9px;
+  border-radius: 6px;
+  font-size: 11px;
+  text-transform: capitalize;
+}
+
+.place-rating {
+  color: #ffca69;
+  font-size: 13px;
+}
+
+.place-card h2 {
+  margin: 20px 0 10px;
+  font-size: 19px;
+}
+
+.place-description {
+  color: #999;
+  font-size: 13px;
+  line-height: 1.7;
+  min-height: 44px;
+}
+
+.place-address {
+  color: #aaa;
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.place-address span {
+  color: #ff3939;
+}
+
+.place-card-bottom {
+  border-top: 1px solid #292929;
+  margin-top: 18px;
+  padding-top: 15px;
+  font-size: 11px;
+}
+
+.place-city {
+  color: #ddd;
+}
+
+.place-distance {
+  color: #ff5555;
+}
+
+.results-message,
+.empty-results {
+  text-align: center;
+  padding: 50px 15px;
+  color: #aaa;
+}
+
+.error-message {
+  color: #ff5555;
+}
+
+.empty-results h2 {
+  color: #fff;
+}
+
+@media (max-width: 950px) {
+  .places-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .search-results-page {
+    padding: 30px 18px;
+  }
+
+  .places-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .place-card {
+    padding: 18px;
+  }
+}
+
+.place-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bookmark-button {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #393940;
+  border-radius: 50%;
+  background: #18181c;
+  color: #d4d4d8;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.bookmark-button:hover:not(:disabled) {
+  color: #ff4d55;
+  border-color: #ff4d55;
+  transform: scale(1.06);
+}
+
+.bookmark-button.is-saved {
+  color: #ff4d55;
+  background: #321b20;
+  border-color: #ff4d55;
+}
+
+.bookmark-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.bookmark-status {
+  min-height: 18px;
+  margin: 10px 0 0;
+  color: transparent;
+  font-size: 12px;
+}
+
+.bookmark-status.saved {
+  color: #ff656b;
+}
+

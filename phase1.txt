@@ -1,0 +1,318 @@
+Good afternoon. Thank you for giving me this opportunity to introduce myself.
+
+My name is Kartik Bilagi, and I'm currently pursuing my third year of Bachelor's in Computer Engineering.
+
+Along with my academics, I have a strong interest in backend and full-stack development, and I also enjoy solving Data Structures and Algorithms problems to improve my problem-solving skills.
+
+Recently, I built two production-style full-stack applications—an Airline Booking System and a URL Shortener. Through these projects, I worked with technologies like MongoDB, Express.js, React, Node.js, Redis, Kafka, JWT Authentication, BullMQ, Docker, Prometheus, and Grafana. These projects helped me understand how scalable backend systems are designed and monitored.
+
+Currently, I'm also exploring GraphQL and continuously improving my backend development skills by building projects and learning new technologies.
+
+I'm looking for an opportunity where I can contribute to real-world software, learn from experienced engineers, and grow as a full-stack developer.
+
+
+"Kartik, you mentioned Redis in your Airline Booking System. Can you explain why you chose Redis instead of storing seat-lock information directly in MongoDB?"
+I used Redis because seat locking requires very fast read and write operations. If multiple users try to book the same seat simultaneously, storing temporary locks directly in MongoDB would increase database load and isn't ideal for handling high concurrency.
+
+Redis stores data in memory, so it is much faster. I also used Redis TTL (Time-To-Live), which automatically releases the seat lock after a fixed duration if the payment isn't completed. This prevents stale locks and makes the booking process more reliable.
+
+
+"What happens if Redis crashes?"
+
+Tum bol sakte ho:
+
+In a production system, Redis can be configured with persistence and replication for fault tolerance. If Redis becomes unavailable, the application should either retry the operation or temporarily disable new seat reservations until the locking service is restored, depending on the system's requirements
+
+
+
+Interviewer: "Why not use MongoDB transactions?"
+
+Answer:
+
+MongoDB transactions ensure database consistency, but they don't work well for temporary seat reservations where we need automatic expiration. Redis TTL is a better fit because the lock expires automatically if the payment isn't completed, reducing manual cleanup and improving performance.
+
+
+"You also mentioned Kafka for analytics. Why did you use Kafka instead of directly updating the database whenever someone clicked on a shortened URL?"
+
+
+I used Kafka because analytics is not part of the critical user flow. When a user clicks a shortened URL, the main priority is to redirect them as quickly as possible.
+
+Instead of updating the analytics database synchronously, I publish a click event to a Kafka topic. A consumer processes these events asynchronously and updates the analytics database.
+
+This reduces the response time for users, handles high traffic efficiently, and provides reliable event processing. Even if the analytics service is temporarily unavailable, Kafka retains the events, and the consumer can process them later once the service recovers.
+
+
+Interviewer: "If the analytics service is down for 30 minutes, what happens to the click events?"
+The producer continues publishing click events to Kafka. Since Kafka persists messages, they are not lost immediately. Once the analytics consumer is back online, it reads the pending events from the topic and updates the database. This ensures eventual consistency without affecting the user's redirect experience.
+
+
+
+
+"Suppose two users click the 'Book Seat A1' button at exactly the same millisecond. 
+
+Explain step by step how your system prevents both users from booking the same seat."
+Suppose User A and User B both try to book the same seat at exactly the same time.
+Both requests reach the server.
+The application first attempts to acquire a Redis lock for that specific seat using a key like:
+flightId:seatNumber
+Redis guarantees that only one request can successfully acquire this lock.
+Let's say User A acquires it first. User B's request immediately fails because the seat is already locked.
+User A then completes the payment.
+If the payment is successful, the booking details are stored permanently in PostgreSQL using Prisma, and the Redis lock is released.
+If the payment fails or times out, Redis automatically removes the lock after the TTL expires, making the seat available again.
+
+
+"You mentioned Prisma. Why did you choose Prisma instead of writing raw SQL queries?"
+
+I chose Prisma because it improves developer productivity while working with PostgreSQL. It provides a type-safe ORM, so many errors are caught during development itself. Database queries become easier to write and maintain compared to raw SQL, and schema migrations are also straightforward.
+
+For most CRUD operations and business logic, Prisma is more than sufficient. However, if I encounter a performance-critical query or a very complex SQL operation, I can always use raw SQL for that specific part while continuing to use Prisma for the rest of the application.
+
+
+What is the difference between State and Props in React?
+State is used to store and manage data within a component. It is mutable, meaning it can change over time, and when the state changes, React automatically re-renders the component.
+
+Props are used to pass data from a parent component to a child component. They are read-only, meaning a child component cannot directly modify the props it receives.
+
+For example, if I have a Counter component, the count value stored inside it is state. But if the parent component passes the user's name to a child component, that name is received as props.
+
+
+useeffect->useEffect is a React Hook used to perform side effects after a component renders. Side effects include API calls, data fetching, timers, event listeners, subscriptions, or updating the document title.
+
+It allows us to run code after rendering instead of during rendering, helping us keep components predictable and avoid unnecessary operations inside the render function.
+The dependency array controls when the effect runs.
+
+[] → Runs only once after the first render.
+[count] → Runs whenever count changes.
+No dependency array → Runs after every render.
+
+
+Explain the complete JWT Authentication flow from the moment a user logs in until they access a protected API.
+
+When a user logs in, the client sends the email/username and password to the server.
+The server first checks whether the user exists in the database. If the user exists, the entered password is compared with the hashed password stored in the database using bcrypt.compare().
+If the password is correct, the server generates a signed JWT containing information like the user ID and role, and sends it back to the client.
+The client stores the token (for example, in an HttpOnly cookie or local storage, depending on the application's design).
+Whenever the client accesses a protected API, it sends the JWT in the Authorization header as:
+Authorization: Bearer <token>
+The authentication middleware extracts the token and verifies it using jwt.verify(). If the token is valid, the middleware attaches the user information to the request and calls next(). Otherwise, it returns a 401 Unauthorized response.
+
+We never store plain-text passwords because if the database is compromised, every user's password would be exposed. Hashing converts the password into a one-way value that cannot be easily reversed. During login, we hash and compare the entered password with the stored hash instead of storing or comparing plain-text passwords.
+
+
+Why JWT instead of Sessions?
+
+Expected answer:
+
+JWT is stateless, so the server doesn't need to store session data. This makes it easier to scale across multiple servers. Sessions require server-side storage, while JWT contains the required user information inside the signed token.
+
+
+
+Middleware is a function in Express that executes between the client's request and the server's final response. It has access to the request object (req), response object (res), and the next() function.
+
+We use middleware to perform common tasks such as authentication, authorization, logging, request validation, and error handling before the request reaches the actual route handler.
+
+
+For example, in my projects, I use JWT authentication middleware. Whenever a user accesses a protected route, the middleware first verifies the JWT token. If the token is valid, it calls next() and the request proceeds to the controller. Otherwise, it returns a 401 Unauthorized response.
+**Actually, JWT middleware only authenticates the user.
+RBAC middleware checks the user's role.**
+
+PUT is used to replace the entire resource with a new version. Generally, the client sends all the fields of the resource.
+PATCH is used to update only specific fields of an existing resource. Only the fields that need to be changed are sent in the request
+
+
+
+
+
+
+sample data set 
+[
+  {
+    "name": "Spice Garden",
+    "description": "Popular North Indian and Chinese restaurant with family dining.",
+    "latitude": 18.520612,
+    "longitude": 73.856743,
+    "address": "45 JM Road, Shivajinagar",
+    "city": "Pune",
+    "country": "India",
+    "category": "RESTAURANT"
+  },
+  {
+    "name": "Bean & Brew Cafe",
+    "description": "Cozy cafe serving specialty coffee, pastries, and sandwiches.",
+    "latitude": 18.522481,
+    "longitude": 73.858214,
+    "address": "12 FC Road, Shivajinagar",
+    "city": "Pune",
+    "country": "India",
+    "category": "CAFE"
+  },
+  {
+    "name": "Ruby Care Hospital",
+    "description": "Multi-speciality hospital providing emergency and outpatient services.",
+    "latitude": 18.518746,
+    "longitude": 73.861952,
+    "address": "101 MG Road, Camp",
+    "city": "Pune",
+    "country": "India",
+    "category": "HOSPITAL"
+  },
+  {
+    "name": "Iron Forge Fitness",
+    "description": "Modern gym equipped with cardio, strength training, and personal coaching.",
+    "latitude": 18.521933,
+    "longitude": 73.853117,
+    "address": "88 Apte Road",
+    "city": "Pune",
+    "country": "India",
+    "category": "GYM"
+  },
+  {
+    "name": "HDFC Bank ATM",
+    "description": "24x7 ATM with cash withdrawal and deposit facilities.",
+    "latitude": 18.519124,
+    "longitude": 73.857684,
+    "address": "FC Road Junction",
+    "city": "Pune",
+    "country": "India",
+    "category": "ATM"
+  },
+  {
+    "name": "HealthPlus Pharmacy",
+    "description": "Pharmacy offering prescription medicines and healthcare essentials.",
+    "latitude": 18.523578,
+    "longitude": 73.860512,
+    "address": "22 Law College Road",
+    "city": "Pune",
+    "country": "India",
+    "category": "PHARMACY"
+  },
+  {
+    "name": "The Grand Stay",
+    "description": "4-star hotel with premium rooms, conference halls, and fine dining.",
+    "latitude": 18.517632,
+    "longitude": 73.854893,
+    "address": "15 Senapati Bapat Road",
+    "city": "Pune",
+    "country": "India",
+    "category": "HOTEL"
+  },
+  {
+    "name": "Urban Tandoor",
+    "description": "Authentic Indian restaurant famous for kebabs and biryani.",
+    "latitude": 18.524862,
+    "longitude": 73.857215,
+    "address": "7 Baner Road",
+    "city": "Pune",
+    "country": "India",
+    "category": "RESTAURANT"
+  },
+  {
+    "name": "Cafe Mocha Corner",
+    "description": "Casual cafe with artisan coffee, desserts, and free Wi-Fi.",
+    "latitude": 18.516981,
+    "longitude": 73.859624,
+    "address": "18 Koregaon Park",
+    "city": "Pune",
+    "country": "India",
+    "category": "CAFE"
+  },
+  {
+    "name": "Apollo Pharmacy",
+    "description": "Trusted pharmacy providing medicines, wellness products, and home delivery.",
+    "latitude": 18.520118,
+    "longitude": 73.862487,
+    "address": "5 East Street, Camp",
+    "city": "Pune",
+    "country": "India",
+    "category": "PHARMACY"
+  }
+   
+]
+
+
+
+ GeoFind       :4002 / :4003
+ Redis         :6379
+ Kafka         :9092
+ Zookeeper     :2181
+ Prometheus    :9090
+ cAdvisor      :8082
+ Dozzle        :8081
+
+
+
+ RESTAURANT
+CAFE
+HOSPITAL
+GYM
+ATM
+PHARMACY
+HOTEL
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
