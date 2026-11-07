@@ -163,14 +163,13 @@ const categories: Category[] = [
   },
 ];
 type CategorySectionProps = {
-  onCategorySelect: (category: string) => void,
+  onCategorySelect: (category: string|null) => void,
   selectedCategory: string | null
 }
 function CategorySection({
   onCategorySelect,
   selectedCategory
 }: CategorySectionProps) {
-  const groups = [...new Set(categories.map((category) => category.group))];
   return (
     <section className="category-section">
       <div className="section-header">

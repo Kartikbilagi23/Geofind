@@ -3,7 +3,6 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery } from "@apollo/client/react";
 import Navbar from "../components/Navbar";
-import { useUser } from "../context/UserContext";
 import {
   GET_PLACE_DETAILS,
   GET_REVIEWS,
@@ -57,7 +56,6 @@ type MyReviewData = {
 function PlaceDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user } = useUser();
 
   const placeId = Number(id);
   const validPlaceId = Number.isInteger(placeId) && placeId > 0;

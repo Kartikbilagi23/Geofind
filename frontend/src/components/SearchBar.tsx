@@ -2,7 +2,6 @@ import { useState } from "react";
 function SearchBar({onSearch}:{onSearch:(query:string)=>void}){
     const [search, setsearch] = useState("");
     const [location, setlocation] = useState("");
-    const [searched, setsearched] = useState("");
 
 return (
     <div className="search-wrapper">

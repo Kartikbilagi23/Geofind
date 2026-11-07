@@ -19,7 +19,7 @@ function Home() {
   const [query, setquery] = useState("");
   const [places, setplaces] = useState<Place[]>([]);
   const [category, setcategory] = useState<string | null>(null);
-  const [userLocation, setuserLocation] = useState<Coordinate>({
+  const [userLocation] = useState<Coordinate>({
     latitude: 18.5204,
     longitude: 73.8567,
   })
@@ -28,7 +28,6 @@ function Home() {
   const [getRoute, {
     data: routeData,
     loading: routeLoading,
-    error: routeError
   }] = useLazyQuery<RouteData, RouteVariables>(GET_ROUTE, {
     fetchPolicy: "network-only",
   });
@@ -46,18 +45,19 @@ function Home() {
     });
   }
 
-  function slideleft() {
-    return carouselRef.current?.scrollBy({
-      left: 450,
-      behavior: "smooth"
-    })
-  }
-  function slideright() {
-    return carouselRef.current?.scrollBy({
-      left: -450,
-      behavior: "smooth"
-    })
-  }
+function slideRight() {
+  carouselRef.current?.scrollBy({
+    left: 450,
+    behavior: "smooth"
+  });
+}
+
+function slideLeft() {
+  carouselRef.current?.scrollBy({
+    left: -450,
+    behavior: "smooth"
+  });
+}
 
   const { data, loading, error } = useQuery<NearbyPlacesData>(
     NEARBY_PLACES,
@@ -168,8 +168,8 @@ function Home() {
                     : "Places near you"}
               </h2>            </div>
             <div className="carousel-buttons">
-              <button onClick={slideleft}>←</button>
-              <button onClick={slideright}>→</button>
+              <button onClick={slideLeft}>←</button>
+              <button onClick={slideRight}>→</button>
             </div>
           </div>
           <div className="places-carousel" ref={carouselRef}>
