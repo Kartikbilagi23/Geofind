@@ -38,14 +38,6 @@ jobs:
 
       - name: Build frontend
         run: npm run build
-  docker:
-    name: Docker image build
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-    - name: Build backend Docker image
-      run: docker build -t geofind-ci .
 
   backend:
     name: Backend checks
@@ -67,11 +59,14 @@ jobs:
 
       - name: Check server syntax
         run: node --check server.js
+
   docker:
     name: Docker image build
     runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-    - name: Build backend Docker image
-      run: docker build -t geofind-ci .
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build backend Docker image
+        run: docker build -t geofind-ci .
