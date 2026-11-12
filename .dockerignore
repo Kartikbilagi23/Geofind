@@ -3,4 +3,5 @@ npm-debug.log
 .env
 .git
 .gitignore
+certs/
 README.md

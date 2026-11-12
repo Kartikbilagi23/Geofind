@@ -12,9 +12,6 @@ import dotenv from "dotenv";
 import http from "http";
 
 dotenv.config();
-console.log("DB URL LOADED:", !!process.env.DATABASE_URL, process.env.DATABASE_URL?.slice(0, 40));
-
-console.log("Does schema contain query?", typeDefs.includes("query: String"));
 const server = new ApolloServer({
   typeDefs,
   resolvers,
@@ -22,7 +19,7 @@ const server = new ApolloServer({
 
 const { url } = await startStandaloneServer(server, {
   listen: {
-    port: 4002,
+    port: Number(process.env.PORT)||4002,
     host: "0.0.0.0",
   },
 
@@ -34,7 +31,6 @@ const { url } = await startStandaloneServer(server, {
 
     if (token) {
       try {
-        console.log("verify SECRET:", process.env.JWT_SECRET);
         const decoded = jwt.verify(
           token,
           process.env.JWT_SECRET
