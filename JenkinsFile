@@ -1,0 +1,73 @@
+
+pipeline {
+    agent any
+
+    tools {
+        nodejs 'NodeJS-22'
+    }
+
+    options {
+        timestamps()
+        timeout(time: 20, unit: 'MINUTES')
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+                sh 'git rev-parse --short HEAD'
+            }
+        }
+
+        stage('Backend Dependencies') {
+            steps {
+                sh 'npm ci'
+            }
+        }
+
+        stage('Generate Prisma Client') {
+            steps {
+                withCredentials([
+                    string(
+                        credentialsId: 'neon-direct-url',
+                        variable: 'DIRECT_URL'
+                    )
+                ]) {
+                    sh 'npx prisma generate'
+                }
+            }
+        }
+
+        stage('Backend Validation') {
+            steps {
+                sh '''
+                    node --check server.js
+                    node --check worker.js
+                    node --check src/libs/kafka.js
+                    node --check src/libs/redis.js
+                    node --check src/graphql/resolvers.js
+                '''
+            }
+        }
+
+        stage('Frontend Build') {
+            steps {
+                dir('frontend') {
+                    sh 'npm ci'
+                    sh 'npm run build'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'GeoFind CI: All stages passed!'
+        }
+
+        failure {
+            echo 'GeoFind CI: Pipeline failed. Check the stage logs.'
+        }
+    }
+}
