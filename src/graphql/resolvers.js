@@ -244,14 +244,7 @@ export const resolvers = {
           place.category.toLowerCase().includes(query.toLowerCase()) ||
           place.city.toLowerCase().includes(query.toLowerCase())
         ) : nearby;
-        const event = JSON.parse(message.value.toString());
 
-        console.log("RAW KAFKA EVENT:", event);
-
-        console.log("Search event received:", {
-          category: event.category,
-          result: event.result
-        });
         await producer.send({
           topic: "search-events",
           messages: [
@@ -635,7 +628,6 @@ export const resolvers = {
         if (!isvalid) {
           throw new Error('Invalid credentials');
         }
-        console.log("SIGNING SECRET:", process.env.JWT_SECRET);
         const token = jwt.sign(
           { userId: user.id, email: user.email },
           process.env.JWT_SECRET,
