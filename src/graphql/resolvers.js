@@ -244,7 +244,14 @@ export const resolvers = {
           place.category.toLowerCase().includes(query.toLowerCase()) ||
           place.city.toLowerCase().includes(query.toLowerCase())
         ) : nearby;
+        const event = JSON.parse(message.value.toString());
 
+        console.log("RAW KAFKA EVENT:", event);
+
+        console.log("Search event received:", {
+          category: event.category,
+          result: event.result
+        });
         await producer.send({
           topic: "search-events",
           messages: [
@@ -391,9 +398,9 @@ export const resolvers = {
         await refreshPlaceRating(tx, placeId);
 
         return review;
-      },{
-        maxWait:10000,
-        timeout:20000
+      }, {
+        maxWait: 10000,
+        timeout: 20000
       });
     },
     deleteReview: async (_, args, context) => {
@@ -426,9 +433,9 @@ export const resolvers = {
         await refreshPlaceRating(tx, review.placeId);
 
         return true;
-      },{
-        maxWait:10000,
-        timeout:20000
+      }, {
+        maxWait: 10000,
+        timeout: 20000
       });
     },
     seedPlaces: async (_, args, context) => {
