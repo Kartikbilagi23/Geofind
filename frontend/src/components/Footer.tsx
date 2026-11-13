@@ -2,11 +2,11 @@
 import "./Footer.css";
 
 const puneSearches = [
-  { label: "Restaurants in Pune", category: "RESTUARANTS" },
-  { label: "Cafes in Pune", category: "cafes" },
-  { label: "Hospitals in Pune", category: "hospitals" },
-  { label: "Hotels in Pune", category: "hotels" },
-  { label: "ATMs in Pune", category: "atms" },
+  { label: "Restaurants in Pune", category: "RESTAURANT" },
+  { label: "Cafes in Pune", category: "CAFE" },
+  { label: "Hospitals in Pune", category: "HOSPITAL" },
+  { label: "Hotels in Pune", category: "HOTEL" },
+  { label: "ATMs in Pune", category: "ATM" },
 ];
 
 function Footer() {
@@ -40,16 +40,16 @@ function Footer() {
 
         <div className="footer-column">
           <h3>Explore</h3>
-          <a href="/search?city=Pune&category=restaurants">
+          <a href="/search?city=Pune&category=RESTAURANT">
             Food & Dining
           </a>
-          <a href="/search?city=Pune&category=cafes">
+          <a href="/search?city=Pune&category=CAFE">
             Cafes & Coffee
           </a>
-          <a href="/search?city=Pune&category=hospitals">
+          <a href="/search?city=Pune&category=HOSPITAL">
             Healthcare
           </a>
-          <a href="/search?city=Pune&category=hotels">
+          <a href="/search?city=Pune&category=HOTEL">
             Hotels & Stays
           </a>
         </div>
@@ -59,7 +59,7 @@ function Footer() {
           <a href="/about">About Us</a>
           <a href="/about#how-it-works">How It Works</a>
           <a
-            href="https://github.com/"
+            href="https://github.com/Kartikbilagi23/Geofind"
             target="_blank"
             rel="noreferrer"
           >
