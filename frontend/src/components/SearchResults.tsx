@@ -12,6 +12,7 @@ const NEARBY_PLACES = gql`
     $radius: Float!
     $category: String
     $query: String
+    $city:String
   ) {
     nearbyPlaces(
       latitude: $latitude
@@ -19,6 +20,7 @@ const NEARBY_PLACES = gql`
       radius: $radius
       category: $category
       query: $query
+      city:$city
     ) {
       id
       name
@@ -83,6 +85,7 @@ interface NearbyPlacesVariables {
   radius: number;
   category: string | null;
   query: string | null;
+  city:string
 }
 
 interface SavedPlace {
@@ -109,14 +112,40 @@ interface RemoveSavedPlaceData {
   removeSavedPlace: boolean;
 }
 
+
 const categoryMap: Record<string, string> = {
+  restaurant: "RESTAURANT",
   restaurants: "RESTAURANT",
+  cafe: "CAFE",
   cafes: "CAFE",
+  hospital: "HOSPITAL",
   hospitals: "HOSPITAL",
+  gym: "GYM",
   gyms: "GYM",
+  atm: "ATM",
   atms: "ATM",
+  pharmacy: "PHARMACY",
   pharmacies: "PHARMACY",
+  hotel: "HOTEL",
   hotels: "HOTEL",
+  plumber: "PLUMBER",
+  electrician: "ELECTRICIAN",
+  hvac: "HVAC",
+  contractor_handyman: "CONTRACTOR_HANDYMAN",
+};
+
+const categoryLabels: Record<string, string> = {
+  RESTAURANT: "Restaurants",
+  CAFE: "Cafes",
+  HOSPITAL: "Hospitals",
+  GYM: "Gyms",
+  ATM: "ATMs",
+  PHARMACY: "Pharmacies",
+  HOTEL: "Hotels",
+  PLUMBER: "Plumbers",
+  ELECTRICIAN: "Electricians",
+  HVAC: "HVAC Services",
+  CONTRACTOR_HANDYMAN: "Contractors & Handymen",
 };
 
 function SearchResults() {
@@ -125,6 +154,7 @@ function SearchResults() {
   const city = params.get("city") || "Pune";
   const categorySlug = (params.get("category") || "").toLowerCase();
   const category = categoryMap[categorySlug] || "";
+  const categoryLabel = categoryLabels[category] || "Places";
 
   const coordinates: Record<string, [number, number]> = {
     pune: [18.5204, 73.8567],
@@ -146,7 +176,8 @@ function SearchResults() {
         longitude,
         radius: 15,
         category: category || null,
-        query: city,
+        query: null,
+        city
       },
       fetchPolicy: "cache-and-network",
     }
@@ -208,22 +239,18 @@ function SearchResults() {
 
         <p className="results-eyebrow">EXPLORE YOUR CITY</p>
 
-        <h1>
-          {category
-            ? `${category} in ${city}`
-            : `Places in ${city}`}
-        </h1>
+        <h1>{categoryLabel} in {city}</h1>
 
         <p className="results-subtitle">
           Discover places around {city}.
         </p>
       </div>
 
-        {loading&& (
-            <GeoFindLoader message="Finding nearby places"
-            subtitle="Discovering your next favourite spot"
-            />
-        )}
+      {loading && (
+        <GeoFindLoader message="Finding nearby places"
+          subtitle="Discovering your next favourite spot"
+        />
+      )}
 
       {error && (
         <p className="results-message error-message">
@@ -271,9 +298,8 @@ function SearchResults() {
 
                       <button
                         type="button"
-                        className={`bookmark-button ${
-                          isSaved ? "is-saved" : ""
-                        }`}
+                        className={`bookmark-button ${isSaved ? "is-saved" : ""
+                          }`}
                         aria-label={
                           isSaved
                             ? `Remove ${place.name} from saved places`
@@ -319,9 +345,8 @@ function SearchResults() {
                   </div>
 
                   <p
-                    className={`bookmark-status ${
-                      isSaved ? "saved" : ""
-                    }`}
+                    className={`bookmark-status ${isSaved ? "saved" : ""
+                      }`}
                   >
                     {isSaved ? "♥ Saved to My Places" : ""}
                   </p>

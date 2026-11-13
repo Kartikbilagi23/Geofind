@@ -22,7 +22,7 @@ export async function startConsumer() {
                 if (!message.value) return;
 
                 const event = JSON.parse(message.value.toString());
-
+                console.log("RAW KAFKA EVENT",event)
                 console.log("Search event received:", {
                     category: event.category,
                     result: event.result

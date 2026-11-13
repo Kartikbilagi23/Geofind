@@ -94,6 +94,7 @@ myReview(placeId: Int!): Review
     radius: Float!
     category: String
     query: String
+    city: String
   ): [Place!]!
 
   mySavedPlaces: [SavedPlace!]!

@@ -148,75 +148,73 @@ export const resolvers = {
         }
       })
     },
+
     nearbyPlaces: async (_, args, context) => {
       if (!context.user) {
         throw new Error("UNAUTHENTICATED");
       }
+
       searchCounter.inc();
       const end = reqlatency.startTimer();
+
       try {
-        const { latitude, longitude, radius, query, category } = args;
-        //suppose user searched pizza ..redis se nearby:18.5204:73.8567:5
-        //  ↓
-        // pizza results
-        //if user searched cafe...redis sees the same key and gives you the pizza results isliye ->nearby:18.5204:73.8567:5:pizza
-        const cacheKey = `nearby:${latitude}:${longitude}:${radius}:${category || "all"}`;
+        const {
+          latitude,
+          longitude,
+          radius,
+          query,
+          category,
+          city
+        } = args;
+
+        const normalizedCity = city?.trim().toLowerCase() || null;
+
+        // City must be part of the cache key to prevent cross-city results.
+        const cacheKey = `nearby:${latitude}:${longitude}:${radius}:${category || "all"}:${normalizedCity || "all"}`;
+
         const cached = await redis.get(cacheKey);
+
         if (cached) {
           console.log("cache hit");
           cacheCounter.inc();
-          const nearby = JSON.parse(cached);
-          const filtered = query ? nearby.filter(place =>
-            place.name.toLowerCase().includes(query.toLowerCase()) ||
-            place.category.toLowerCase().includes(query.toLowerCase()) ||
-            place.city.toLowerCase().includes(query.toLowerCase())
-          ) : nearby;
-          return filtered;
-        }
-        console.log('Cache Miss')
-        cacheMissCounter.inc();
-        const userhash = ngeohash.encode(
-          latitude, longitude, 6
-        );
-        // await redis.set("test","hello");
-        // const val=await redis.get("test");
 
-        // console.log(val)
+          const nearby = JSON.parse(cached);
+
+          return query
+            ? nearby.filter(place =>
+              place.name.toLowerCase().includes(query.toLowerCase()) ||
+              place.category.toLowerCase().includes(query.toLowerCase()) ||
+              place.city.toLowerCase().includes(query.toLowerCase())
+            )
+            : nearby;
+        }
+
+        console.log("Cache Miss");
+        cacheMissCounter.inc();
+
+        const userhash = ngeohash.encode(latitude, longitude, 6);
         const neigh = ngeohash.neighbors(userhash);
-        const hashes = [
-          userhash, ...neigh
-        ]
-        // console.log("User hash",userhash);
-        // console.log("Search Hashes",hashes);
-        //for e.g. (optimization)
-        //       DB
-        //  ↓
-        // WHERE geohash IN (9 cells)
-        //  ↓
-        // ONLY CANDIDATES
-        //  ↓
-        // Haversine
-        // User hash tek92e
-        // Search Hashes [
-        //   'tek92e', 'tek92s',
-        //   'tek92u', 'tek92g',
-        //   'tek92f', 'tek92d',
-        //   'tek926', 'tek927',
-        //   'tek92k'
-        // ]
+        const hashes = [userhash, ...neigh];
+
         const places = await prisma.place.findMany({
           where: {
             geohash: {
               in: hashes
             },
             ...(category && {
-              category: category
+              category
+            }),
+            ...(normalizedCity && {
+              city: {
+                equals: normalizedCity,
+                mode: "insensitive"
+              }
             })
           }
         });
+
         const nearby = places
           .map(place => {
-
             const distance = haversine(
               latitude,
               longitude,
@@ -228,22 +226,23 @@ export const resolvers = {
               ...place,
               distance
             };
-
           })
           .filter(place => place.distance <= radius)
           .sort((a, b) => a.distance - b.distance);
 
-        await redis.set(cacheKey, JSON.stringify(nearby),
-          {
-            EX: 60
-          }
-        )
+        await redis.set(
+          cacheKey,
+          JSON.stringify(nearby),
+          { EX: 60 }
+        );
 
-        const filtered = query ? nearby.filter(place =>
-          place.name.toLowerCase().includes(query.toLowerCase()) ||
-          place.category.toLowerCase().includes(query.toLowerCase()) ||
-          place.city.toLowerCase().includes(query.toLowerCase())
-        ) : nearby;
+        const filtered = query
+          ? nearby.filter(place =>
+            place.name.toLowerCase().includes(query.toLowerCase()) ||
+            place.category.toLowerCase().includes(query.toLowerCase()) ||
+            place.city.toLowerCase().includes(query.toLowerCase())
+          )
+          : nearby;
 
         await producer.send({
           topic: "search-events",
@@ -255,19 +254,142 @@ export const resolvers = {
                 longitude,
                 radius,
                 category,
+                city,
                 result: filtered.length,
                 searchedAt: new Date()
               })
             }
           ]
-        })
+        });
+
         kafkaMessagesCounter.inc();
+
         return filtered;
-      }
-      finally {
+      } finally {
         end();
       }
     },
+
+    // nearbyPlaces: async (_, args, context) => {
+    //   if (!context.user) {
+    //     throw new Error("UNAUTHENTICATED");
+    //   }
+    //   searchCounter.inc();
+    //   const end = reqlatency.startTimer();
+    //   try {
+    //     const { latitude, longitude, radius, query, category } = args;
+    //     //suppose user searched pizza ..redis se nearby:18.5204:73.8567:5
+    //     //  ↓
+    //     // pizza results
+    //     //if user searched cafe...redis sees the same key and gives you the pizza results isliye ->nearby:18.5204:73.8567:5:pizza
+    //     const cacheKey = `nearby:${latitude}:${longitude}:${radius}:${category || "all"}`;
+    //     const cached = await redis.get(cacheKey);
+    //     if (cached) {
+    //       console.log("cache hit");
+    //       cacheCounter.inc();
+    //       const nearby = JSON.parse(cached);
+    //       const filtered = query ? nearby.filter(place =>
+    //         place.name.toLowerCase().includes(query.toLowerCase()) ||
+    //         place.category.toLowerCase().includes(query.toLowerCase()) ||
+    //         place.city.toLowerCase().includes(query.toLowerCase())
+    //       ) : nearby;
+    //       return filtered;
+    //     }
+    //     console.log('Cache Miss')
+    //     cacheMissCounter.inc();
+    //     const userhash = ngeohash.encode(
+    //       latitude, longitude, 6
+    //     );
+    //     // await redis.set("test","hello");
+    //     // const val=await redis.get("test");
+
+    //     // console.log(val)
+    //     const neigh = ngeohash.neighbors(userhash);
+    //     const hashes = [
+    //       userhash, ...neigh
+    //     ]
+    //     // console.log("User hash",userhash);
+    //     // console.log("Search Hashes",hashes);
+    //     //for e.g. (optimization)
+    //     //       DB
+    //     //  ↓
+    //     // WHERE geohash IN (9 cells)
+    //     //  ↓
+    //     // ONLY CANDIDATES
+    //     //  ↓
+    //     // Haversine
+    //     // User hash tek92e
+    //     // Search Hashes [
+    //     //   'tek92e', 'tek92s',
+    //     //   'tek92u', 'tek92g',
+    //     //   'tek92f', 'tek92d',
+    //     //   'tek926', 'tek927',
+    //     //   'tek92k'
+    //     // ]
+    //     const places = await prisma.place.findMany({
+    //       where: {
+    //         geohash: {
+    //           in: hashes
+    //         },
+    //         ...(category && {
+    //           category: category
+    //         })
+    //       }
+    //     });
+    //     const nearby = places
+    //       .map(place => {
+
+    //         const distance = haversine(
+    //           latitude,
+    //           longitude,
+    //           place.latitude,
+    //           place.longitude
+    //         );
+
+    //         return {
+    //           ...place,
+    //           distance
+    //         };
+
+    //       })
+    //       .filter(place => place.distance <= radius)
+    //       .sort((a, b) => a.distance - b.distance);
+
+    //     await redis.set(cacheKey, JSON.stringify(nearby),
+    //       {
+    //         EX: 60
+    //       }
+    //     )
+
+    //     const filtered = query ? nearby.filter(place =>
+    //       place.name.toLowerCase().includes(query.toLowerCase()) ||
+    //       place.category.toLowerCase().includes(query.toLowerCase()) ||
+    //       place.city.toLowerCase().includes(query.toLowerCase())
+    //     ) : nearby;
+
+    //     await producer.send({
+    //       topic: "search-events",
+    //       messages: [
+    //         {
+    //           value: JSON.stringify({
+    //             userId: context.user.userId,
+    //             latitude,
+    //             longitude,
+    //             radius,
+    //             category,
+    //             result: filtered.length,
+    //             searchedAt: new Date()
+    //           })
+    //         }
+    //       ]
+    //     })
+    //     kafkaMessagesCounter.inc();
+    //     return filtered;
+    //   }
+    //   finally {
+    //     end();
+    //   }
+    // },
     me: async (_, __, context) => {
 
       if (!context.user)
