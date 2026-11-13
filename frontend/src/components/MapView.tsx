@@ -97,6 +97,7 @@ function Mapview({ places, route, selectedPlace }: MapProps) {
       {/* Selected destination marker */}
       {selectedPlace && (
         <Marker
+          icon={redIcon}
           position={[
             selectedPlace.latitude,
             selectedPlace.longitude,
